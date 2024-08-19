@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Newsletter.Infrastructure",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Newsletter.Application", "src\Newsletter.Application\Newsletter.Application.csproj", "{CE7B1F31-3B1B-4353-AA06-C421FAF8B157}"
 EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{1DBD0424-57B9-40F3-BC15-9293EE1EC2D0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,10 @@ Global
 		{CE7B1F31-3B1B-4353-AA06-C421FAF8B157}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CE7B1F31-3B1B-4353-AA06-C421FAF8B157}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CE7B1F31-3B1B-4353-AA06-C421FAF8B157}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1DBD0424-57B9-40F3-BC15-9293EE1EC2D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DBD0424-57B9-40F3-BC15-9293EE1EC2D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1DBD0424-57B9-40F3-BC15-9293EE1EC2D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1DBD0424-57B9-40F3-BC15-9293EE1EC2D0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

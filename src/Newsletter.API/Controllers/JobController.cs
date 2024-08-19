@@ -8,21 +8,12 @@ namespace Newsletter.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class JobController : ControllerBase
+    public class JobController(IBackgroundJobClient backgroundJobClient, IEmailService emailService) : ControllerBase
     {
-        private readonly IBackgroundJobClient _backgroundJobClient;
-        private readonly IEmailService _emailService;
-
-        public JobController(IBackgroundJobClient backgroundJobClient, IEmailService emailService)
-        {
-            _backgroundJobClient = backgroundJobClient;
-            _emailService = emailService;
-        }
-
         [HttpPost]
         public IActionResult SendTestEmail()
         {
-            _backgroundJobClient.Enqueue<EmailJob>(job => job.SendDailyEmail());
+            backgroundJobClient.Enqueue<EmailJob>(job => job.SendDailyEmail());
             return Ok();
         }
 
@@ -31,7 +22,7 @@ namespace Newsletter.API.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _emailService.SendEmailAsync(toEmail, subject, plainTextContent);
+                await emailService.SendEmailAsync(toEmail, subject, plainTextContent);
             }
             return Ok();
         }

@@ -1,29 +1,27 @@
-﻿namespace Newsletter.Infrastructure.Services
+﻿using SendGrid;
+using SendGrid.Helpers.Mail;
+using System.Threading.Tasks;
+using Newsletter.Core.Interfaces;
+
+public class SendGridEmailService : IEmailService
 {
-    using Core.Interfaces;
-    using SendGrid;
-    using SendGrid.Helpers.Mail;
-    using Microsoft.Extensions.Configuration;
-    using System.Net.Mail;
+    private readonly ISendGridClient _sendGridClient;
+    private readonly EmailAddress _from;
 
-    public class SendGridEmailService : IEmailService
+    public SendGridEmailService(string apiKey, string fromEmail, string fromName)
     {
-        private readonly IConfiguration _configuration;
+        _sendGridClient = new SendGridClient(apiKey);
+        _from = new EmailAddress(fromEmail, fromName);
+    }
 
-        public SendGridEmailService(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
+    public async Task<bool> SendEmailAsync(string toEmail, string subject, string plainTextContent, string htmlContent = null)
+    {
+        var to = new EmailAddress(toEmail);
+        var msg = MailHelper.CreateSingleEmail(_from, to, subject, plainTextContent, htmlContent ?? plainTextContent);
 
-        public async Task SendEmailAsync(string toEmail, string subject, string plainTextContent)
-        {
-            var apiKey = _configuration["SendGrid:ApiKey"];
-            var client = new SendGridClient(apiKey);
-            var from = new EmailAddress("dominik0kielkowski@gmail.com", "Dominik Kielkowski");
-            var htmlContent = "<strong>How cool an email!</strong>";
-            var to = new EmailAddress(toEmail);
-            var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
-            var response = await client.SendEmailAsync(msg);
-        }
+        var response = await _sendGridClient.SendEmailAsync(msg);
+
+
+        return response.StatusCode == System.Net.HttpStatusCode.OK || response.StatusCode == System.Net.HttpStatusCode.Accepted;
     }
 }
