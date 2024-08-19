@@ -1,12 +1,13 @@
 using Hangfire;
+using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Newsletter.Application.Commands_Queries.MakeReservation;
+using Newsletter.Application.Extensions;
 using Newsletter.Application.Jobs;
-using Newsletter.Application.Services;
 using Newsletter.Core.Interfaces;
 using Newsletter.Infrastructure.Data;
-using Newsletter.Infrastructure.Extensions;
-using Newsletter.Infrastructure.Services;
-using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +15,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
-
 
 builder.Services.AddDbContext<NewsletterDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -25,9 +25,26 @@ builder.Services.AddHangfire((sp, config) =>
     config.UseSqlServerStorage(connectionString);
 });
 
-builder.Services.AddHangfireServer();
+// MediatR setup
+builder.Services.ConfigureMediatR();
 
-builder.Services.AddTransient<IEmailService, SendGridEmailService>();
+// Email service setup
+builder.Services.AddScoped<IEmailService>(provider =>
+{
+    var configuration = provider.GetRequiredService<IConfiguration>();
+    return new SendGridEmailService(
+        configuration["SendGrid:ApiKey"],
+        configuration["SendGrid:FromEmail"],
+        configuration["SendGrid:FromName"]
+    );
+});
+
+// Register other services
+builder.Services.AddTransient<MakeReservationCommandHandler>();
+
+builder.Services.AddHangfireServer();
+builder.Services.AddMassTransitWithRabbitMQ();
+
 builder.Services.AddTransient<EmailJob>();
 
 var app = builder.Build();
@@ -38,11 +55,9 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
 
 app.MapControllers();
-
 app.UseHangfireDashboard();
 
 app.Run();
